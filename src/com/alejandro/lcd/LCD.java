@@ -5,26 +5,18 @@
  */
 package com.alejandro.lcd;
 
-import static com.alejandro.lcd.ImpresorLCD.isNumeric;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Toshiba
  */
 public class LCD {
-    
-    Numero[] arrayNumeros = new Numero[10];
-    
-    
-    String[][] display;
-    
-    private int size;
-    
-    public LCD() {
-        crearNumeros();
-    }
-    
-    void crearNumeros() {
+
+    static Numero[] arrayNumeros = new Numero[10];
+
+    static {
         arrayNumeros[0] = new Numero(1, 2, 3, 4, 5, 7);
         arrayNumeros[1] = new Numero(3, 4);
         arrayNumeros[2] = new Numero(2, 3, 5, 6, 7);
@@ -35,139 +27,98 @@ public class LCD {
         arrayNumeros[7] = new Numero(3, 4, 5);
         arrayNumeros[8] = new Numero(1, 2, 3, 4, 5, 6, 7);
         arrayNumeros[9] = new Numero(1, 3, 4, 5, 6, 7);
-        
     }
-    
-    void calcularMatrizDisplay(int size) {
-        this.size = size;
+
+    static String[][] inicializarMatriz(int size) {
         int x = size * 2 + 3;
-        int y = size + 2;        
-        display = new String[x][y];  
-        limpiarMatriz();
+        int y = size + 2;
+        String[][] display = new String[x][y];
+        limpiarMatriz(display);
+
+        return display;
     }
-    
-    void limpiarMatriz (){
+
+    static void limpiarMatriz(String[][] display) {
         for (String[] display1 : display) {
             for (int j = 0; j < display1.length; j++) {
                 display1[j] = " ";
             }
         }
     }
-    
-    void pintarMatriz(Numero numero) {
-        limpiarMatriz();
-        for(Integer displaySegment: numero.getDisplayList()) {
+
+    static String[][] getMatriz(Numero numero, int size) {
+        String[][] display = inicializarMatriz(size);
+        for (Integer displaySegment : numero.getDisplayList()) {
             switch (displaySegment) {
                 case 1:
-                    for(int i = 1; i< size+1; i++) {
+                    for (int i = 1; i < size + 1; i++) {
                         display[i][0] = "|";
-                    }                    
+                    }
                     break;
                 case 2:
-                    int x = size+2;
-                    for(int i = x; i < size * 2+2; i++) {
+                    int x = size + 2;
+                    for (int i = x; i < size * 2 + 2; i++) {
                         display[i][0] = "|";
-                    }                    
+                    }
                     break;
                 case 3:
                     int y = size + 1;
-                    for(int i = 1; i< size+1; i++) {
+                    for (int i = 1; i < size + 1; i++) {
                         display[i][y] = "|";
-                    } 
-                    
+                    }
+
                     break;
                 case 4:
                     y = size + 1;
                     x = size + 2;
-                    for(int i = x; i < size * 2+2; i++) {
+                    for (int i = x; i < size * 2 + 2; i++) {
                         display[i][y] = "|";
-                    } 
+                    }
                     break;
                 case 5:
-                    for(int j = 1; j< size+1; j++) {
+                    for (int j = 1; j < size + 1; j++) {
                         display[0][j] = "-";
                     }
                     break;
                 case 6:
-                    x = size+1;
-                    for(int j = 1; j< size+1; j++) {
+                    x = size + 1;
+                    for (int j = 1; j < size + 1; j++) {
                         display[x][j] = "-";
                     }
                     break;
                 case 7:
-                    x = size * 2 +2;
-                    for(int j = 1; j< size+1; j++) {
+                    x = size * 2 + 2;
+                    for (int j = 1; j < size + 1; j++) {
                         display[x][j] = "-";
                     }
-                    break;                   
+                    break;
 
             }
         }
-        for (int i = 0; i < display.length; i++) {
-            for (int j = 0; j < display[i].length; j++) {
-                System.out.print(display[i][j]);
+
+        return display;
+    }
+
+    public static void procesarMatriz(int espacio, int size, List<Integer> listNumeros) {
+        String espacios = "";
+        for (int k = 0; k < espacio; k++) {
+            espacios = espacios + " ";
+        }        
+        List<String[][]> listDisplay = new ArrayList<>();
+        for (Integer numero : listNumeros) {
+            String[][] display = getMatriz(arrayNumeros[numero], size);
+            listDisplay.add(display);
+        }
+        int numeroLineas = size * 2 + 3;
+        for (int i = 0; i < numeroLineas; i++) {
+            for (String[][] display : listDisplay) {
+                for (int j = 0; j < size + 2; j++) {
+                    System.out.print(display[i][j]);
+                }
+                System.out.print(espacios);
             }
             System.out.println();
         }
     }
-    static boolean esEntero(String cadena) {
-        try {
-            Integer.parseInt(cadena);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-    }
-  /*public static void main(String[] args) {
-        LCD lcd = new LCD();
-        lcd.calcularMatrizDisplay(4);//size
-        for(int i = 0; i<10; i++){
-        lcd.pintarMatriz(lcd.arrayNumeros[i]);
-            System.out.println(" ");
-        }
-    }*/
-    public void procesar(String comando, int espacioDig) {
 
-        String[] parametros;
-
-        int tam;
-
-        if (!comando.contains(",")) {
-            throw new IllegalArgumentException("Cadena " + comando
-                    + " no contiene caracter ,");
-        }
-
-        //Se hace el split de la cadena
-        parametros = comando.split(",");
-
-        //Valida la cantidad de parametros
-        if (parametros.length > 2) {
-            throw new IllegalArgumentException("Cadena " + comando
-                    + " contiene mas caracter ,");
-        }
-
-        //Valida la cantidad de parametros
-        if (parametros.length < 2) {
-            throw new IllegalArgumentException("Cadena " + comando
-                    + " no contiene los parametros requeridos");
-        }
-
-        //Valida que el parametro size sea un numerico
-        if (isNumeric(parametros[0])) {
-            tam = Integer.parseInt(parametros[0]);
-
-            // se valida que el size este entre 1 y 10
-            if (tam < 1 || tam > 10) {
-                throw new IllegalArgumentException("El parametro size [" + tam
-                        + "] debe estar entre 1 y 10");
-            }
-        } else {
-            throw new IllegalArgumentException("Parametro Size [" + parametros[0]
-                    + "] no es un numero");
-        }
-
-        // Realiza la impresion del numero
-        imprimirNumero(tam, parametros[1], espacioDig);
-
-    }
 }

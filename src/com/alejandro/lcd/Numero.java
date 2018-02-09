@@ -13,19 +13,15 @@ import java.util.List;
  * @author Toshiba
  */
 public class Numero {
-    
+
     List<Integer> displayList;
 
     public List<Integer> getDisplayList() {
         return displayList;
     }
 
-    public void setDisplayList(List<Integer> displayList) {
-        this.displayList = displayList;
-    }
-    
-    Numero(Integer ... numeros) {
+    Numero(Integer... numeros) {
         this.displayList = Arrays.asList(numeros);
-    }   
-    
+    }
+
 }
